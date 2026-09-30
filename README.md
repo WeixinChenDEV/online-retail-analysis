@@ -1,134 +1,90 @@
-# Retail Insights — Power BI portfolio case study
+# Online Retail Analysis
 
-A reproducible retail analysis covering trading performance, products and markets,
-customer segmentation, and cohort repeat-purchase activity.
+A data analysis project using Python, SQL and Power BI. It uses the UCI Online
+Retail dataset to look at sales, customer segments and repeat purchases.
+The data covers December 2010 to December 2011 and contains 541,909 rows.
 
-**Status:** Data preparation, SQL reconciliations and native PBIR schema checks passed.
-Desktop screenshots and the exact scope of runtime checks are recorded in
-[validation status](docs/validation.json). This is an independent
-historical case study; no affiliation with the retailer or UCI is implied.
+![Sales overview](assets/screenshots/overview.jpg)
 
-![Power BI Desktop — trading overview](assets/screenshots/overview.jpg)
+## What the report shows
 
-## Business questions
+- Sales, credits and order value by month and country
+- Product sales and the difference between merchandise and other charges
+- Customer groups based on recency, frequency and monetary value (RFM)
+- Monthly purchase activity for customers grouped by their first purchase month
 
-1. How do recorded sales, credits and order values vary over time?
-2. Which products and countries contribute to gross sales?
-3. Which identifiable customers repeatedly purchase and merit further investigation?
-4. How does repeat-purchase activity differ across first-observed-purchase cohorts?
+There are four report pages. The customer groups use a fixed snapshot at the
+end of the dataset; they do not change with the sales page's date filter.
 
-## Results at a glance
+## A few results
 
-| Metric | Observed result |
+| Metric | Result |
 | --- | ---: |
-| Original source rows | 541,909 |
-| Gross positive sales | £10,666,684.54 |
+| Gross sales | £10,666,684.54 |
 | Recorded credits | £896,812.49 |
 | Net recorded sales | £9,769,872.05 |
-| Positive-sale invoices | 19,960 |
-| Identifiable purchasing customers | 4,338 |
-| Whole-window repeat customer share | 65.6% |
-| Gross sales linked to identifiable customers | 83.5% |
+| Sales orders | 19,960 |
+| Customers with a recorded ID and at least one purchase | 4,338 |
+| Customers who placed more than one order | 65.6% |
 
-These figures use the policy in [methodology](docs/methodology.md). They are not
-profit, a matched return rate, or current-market estimates.
+The UK accounts for 84.6% of gross sales. The Champions RFM group has 911
+customers and accounts for about 63.8% of sales linked to known customers.
+More detail is in [results](docs/results.md).
 
-## Power BI deliverable
+## Run it
 
-Open **`powerbi/RetailInsights.pbip`** in standard Power BI Desktop. The report
-contains four pages, 28 native visuals, seven tables and 18 DAX measures.
-The local working copy also includes `RetailInsights.pbix` with imported data.
-That binary is excluded from Git because its refresh metadata contains the local
-machine's data path; the public repository contains reproducible PBIP source and CSVs.
-
-| Page | Purpose |
-| --- | --- |
-| Trading overview | Month/country slicers, financial KPIs, monthly trends and controls |
-| Products & markets | Product/country comparisons, merchandise/charges selection, detail |
-| Customer snapshot | Fixed RFM segments, customer counts, sales contributions, customer detail |
-| Cohort repeat activity | Cohort slicer, month-offset matrix, explicit observed-cell denominators |
-
-The model uses invoice-line and invoice-level facts with shared single-direction
-dimensions. The cohort aggregate is separate so its denominators cannot be
-silently changed by unrelated slicers. Monetary values use fixed-decimal types.
-
-### Open with the included prepared data
+Python 3.10+ is needed for the scripts, and Power BI Desktop is needed for the report.
 
 ```bash
-python scripts/configure_local.py
-```
-
-Then open the PBIP and select **Refresh**. `DataFolder` must point to the clone's
-`data/processed` folder. The project has no Desktop cache; visuals will populate
-only after refresh. Optionally apply `assets/retail-theme.json` through
-View → Themes → Browse for themes. The included PBIR report already applies the theme.
-
-Do not commit the personal local path inserted by `configure_local.py`. Regenerate
-the data parameter with `python scripts/configure_local.py --portable` to restore the portable placeholder.
-See [Chinese opening and validation guide](docs/打开项目.md).
-
-### Reproduce from the original source
-
-Requires Python 3.10+ and the dependencies in `requirements.txt`.
-
-```bash
-python -m venv .venv
-# Windows: .venv\Scripts\activate
-# macOS/Linux: source .venv/bin/activate
 python -m pip install -r requirements.txt
 python scripts/download_data.py
-python scripts/analyze.py
-python scripts/build_powerbi.py
-python scripts/test_data.py
-python scripts/validate_report.py
-python scripts/create_previews.py
-python scripts/configure_local.py
+python scripts/prepare_data.py
+python scripts/check_data.py
+python scripts/setup_paths.py
 ```
 
-The validator retrieves public Microsoft schemas and requires network access.
-PBIR `definition/version.json` uses report format `2.0.0`; setting it to `1.0.0`
-can make Desktop load an empty report even when JSON schema validation passes.
-Desktop can rewrite schemas to newer versions on save; `build_powerbi.py --report-only`
-restores the reproducible report definition without replacing the saved semantic model.
-The download script retrieves the original workbook from UCI. Prepared CSVs are
-included for opening the report without rerunning preparation; raw data, SQLite
-working databases, package folders and Desktop caches are ignored by Git.
+Open `powerbi/OnlineRetail.pbip` in Power BI Desktop, apply pending query changes
+if prompted, then refresh. Prepared CSVs are included, so the download and
+preparation steps can be skipped when just opening the report.
+See [setup notes (中文)](docs/setup.md) if the first refresh does not work.
 
-## Analytical decisions
+The local working folder also has `powerbi/OnlineRetail.pbix`, with data already
+loaded. It is not committed because its refresh settings contain a local file path.
+Before committing changes, run `python scripts/setup_paths.py --portable` to
+restore the source project's placeholder path.
 
-- Retain sales without customer IDs in financial totals, but exclude them from
-  identifiable-customer RFM and cohort denominators.
-- Preserve credit-only customer IDs for referential integrity without counting them as purchasers.
-- Keep exact repeated source rows: missing transaction-line identifiers prevent confident deduplication.
-- Separate positive-price purchases, negative-quantity credits and excluded entries.
-- Omit incomplete December 2011 cohort cells. Blank means unobserved; observed zero stays zero.
-- Use tied percentile ranks and documented RFM rules rather than claiming a trained churn model.
-- Label customer scores as a fixed snapshot as of 10 December 2011.
+## Files
 
-![Power BI Desktop — customer snapshot](assets/screenshots/customers.jpg)
-![Power BI Desktop — cohort repeat activity](assets/screenshots/cohorts.jpg)
+```text
+scripts/       download, clean data, check totals, set local paths
+data/          source workbook (not committed) and prepared CSVs
+sql/           queries used to check and explore the data
+powerbi/       report pages, Power Query and DAX model
+tools/         scripts for rebuilding and checking the report files
+docs/          analysis notes, results and check records
+assets/        report screenshots and theme
+```
 
-## Inspect the work
+To rebuild the Power BI source files, run `python tools/build_report.py` before
+setting the local paths. `python tools/check_report.py` checks the report JSON
+against Microsoft's public schemas. It needs internet access on its first run.
+The report has been opened in Desktop; totals and two slicer examples were
+checked against SQL. [Check records](docs/checks.json) describe what was tested.
 
-- [Analysis and action hypotheses](docs/findings.md)
-- [Data contract and limitations](docs/methodology.md)
-- [DAX measures](docs/measures.dax)
-- [SQL analysis and controls](sql/analysis.sql)
-- [Machine-readable analysis summary](docs/analysis_summary.json)
-- [Validation status](docs/validation.json)
-- [Filter and cohort data tests](docs/data_tests.json)
-- [Interview and learning notes (中文)](docs/学习与面试.md)
+## Things to keep in mind
 
-## Data attribution and license
+- Missing customer IDs are kept in sales totals, but excluded from customer analysis.
+- Credits are recorded separately. They cannot all be matched to original purchases.
+- Exact repeated rows are kept because the source has no unique transaction-line ID.
+- December 2011 ends on the 9th. It is excluded from the complete-month cohort comparison.
+- The dataset includes wholesale orders. Average order value is not necessarily a typical shopper's basket.
 
-Chen, D. (2015). *Online Retail* [Dataset]. UCI Machine Learning Repository.
-[DOI 10.24432/C5BW33](https://doi.org/10.24432/C5BW33), licensed under CC BY 4.0.
-The original observations span 1 December 2010–9 December 2011.
-See [data attribution](DATA_LICENSE.md). Project code and authored report definitions
-are MIT-licensed; source and derived data retain their attribution requirements.
+The cleaning rules and RFM definitions are in [analysis notes](docs/notes.md).
+AI tools assisted with Python code and report-file generation; the check records
+document the verification carried out on the result.
 
-## Technical references
+## Data source
 
-- [Microsoft: Power BI Desktop projects](https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-overview)
-- [Microsoft: PBIR report format](https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-report)
-- [Microsoft: semantic model format](https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-dataset)
+Chen, D. (2015). *Online Retail*. UCI Machine Learning Repository.
+[Dataset and DOI](https://doi.org/10.24432/C5BW33), CC BY 4.0.
+See [data attribution](DATA_LICENSE.md). Project code is MIT licensed.
