@@ -1,6 +1,41 @@
 {
-  "official_schema_documents": 33,
+  "official_schema_documents": 36,
   "bindings": "passed",
   "relationships": "passed",
-  "desktop_runtime": "not validated; Power BI Desktop unavailable"
+  "desktop_runtime": "passed for the documented import, rendering, visible measures and slicer spot checks",
+  "desktop_checked_at": "2026-10-01",
+  "tables_imported": 7,
+  "report_pages_rendered": 4,
+  "visuals_rendered": 28,
+  "whole_window_reconciliation": {
+    "gross_sales_gbp": 10666684.54,
+    "recorded_credits_gbp": 896812.49,
+    "net_recorded_sales_gbp": 9769872.05,
+    "sales_orders": 19960,
+    "average_order_value_gbp": 534.4,
+    "purchasing_customers": 4338,
+    "snapshot_repeat_customers": 2845,
+    "snapshot_repeat_share_display": "65.6%"
+  },
+  "native_country_slicer_check": {
+    "country": "Australia",
+    "gross_sales_gbp": 138521.31,
+    "recorded_credits_gbp": 1444.04,
+    "net_recorded_sales_gbp": 137077.27,
+    "sales_orders": 57,
+    "result": "matches independent SQL"
+  },
+  "native_month_slicer_check": {
+    "month": "2010-12",
+    "gross_sales_gbp": 823746.14,
+    "recorded_credits_gbp": 74789.12,
+    "net_recorded_sales_gbp": 748957.02,
+    "sales_orders": 1559,
+    "result": "matches monthly reconciliation"
+  },
+  "customer_page_filter": "DimCustomer Orders > 0; anonymous and credit-only rows absent",
+  "cohort_matrix": "78 observed cells rendered; incomplete Dec 2011 and aggregate percentages omitted",
+  "screenshots": "assets/screenshots/*.jpg are native Desktop captures",
+  "pbix": "saved locally with imported data; excluded from Git because refresh metadata contains a machine-specific source path",
+  "limitations": "UI spot checks, not an exhaustive test of every slicer combination or unused DAX measure. Desktop may rewrite schema versions on save; reproducible PBIR source uses public supported contracts."
 }

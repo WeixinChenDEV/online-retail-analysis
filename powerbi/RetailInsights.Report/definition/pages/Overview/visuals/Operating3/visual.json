@@ -1,54 +1,18 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.1.0/schema.json",
-  "name": "RetentionMatrix",
+  "name": "Operating3",
   "position": {
-    "x": 24,
-    "y": 124,
+    "x": 1058,
+    "y": 408,
     "z": 0,
-    "height": 440,
-    "width": 1232,
+    "height": 152,
+    "width": 198,
     "tabOrder": 0
   },
   "visual": {
-    "visualType": "pivotTable",
+    "visualType": "card",
     "query": {
       "queryState": {
-        "Rows": {
-          "projections": [
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "FactCohort"
-                    }
-                  },
-                  "Property": "Cohort"
-                }
-              },
-              "queryRef": "FactCohort.Cohort",
-              "nativeQueryRef": "Cohort"
-            }
-          ]
-        },
-        "Columns": {
-          "projections": [
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "FactCohort"
-                    }
-                  },
-                  "Property": "Offset"
-                }
-              },
-              "queryRef": "FactCohort.Offset",
-              "nativeQueryRef": "Offset"
-            }
-          ]
-        },
         "Values": {
           "projections": [
             {
@@ -59,11 +23,11 @@
                       "Entity": "FactTransactions"
                     }
                   },
-                  "Property": "Cohort Repeat Activity"
+                  "Property": "Credit Value Share"
                 }
               },
-              "queryRef": "FactTransactions.Cohort Repeat Activity",
-              "nativeQueryRef": "Cohort Repeat Activity"
+              "queryRef": "FactTransactions.Credit Value Share",
+              "nativeQueryRef": "Credit Value Share"
             }
           ]
         }
@@ -83,7 +47,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Monthly repeat-purchase activity | incomplete Dec 2011 omitted'"
+                  "Value": "'Credit Value Share'"
                 }
               }
             },
@@ -180,44 +144,37 @@
     },
     "drillFilterOtherVisuals": true,
     "objects": {
-      "grid": [
+      "labels": [
         {
           "properties": {
-            "textSize": {
+            "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "11"
+                  "Value": "24"
+                }
+              }
+            },
+            "displayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "0"
+                }
+              }
+            },
+            "precision": {
+              "expr": {
+                "Literal": {
+                  "Value": "2"
                 }
               }
             }
           }
         }
       ],
-      "subTotals": [
+      "categoryLabels": [
         {
           "properties": {
-            "rowSubtotals": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
-                }
-              }
-            },
-            "columnSubtotals": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
-                }
-              }
-            },
-            "rowGrandTotal": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
-                }
-              }
-            },
-            "columnGrandTotal": {
+            "show": {
               "expr": {
                 "Literal": {
                   "Value": "false"

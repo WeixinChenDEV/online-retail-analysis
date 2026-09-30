@@ -20,6 +20,8 @@ The observed customer's first purchase is not necessarily their lifetime first p
 - `Credit Value Share`: credits / gross sales; not a matched return rate.
 - Exactly repeated source rows are retained (5,268 rows). Without line IDs,
   deleting them could delete legitimate repeated lines. A removal sensitivity is reported separately.
+  Removing all exact repeated rows would reduce gross sales by £24,573.74 (about 0.23%).
+  This sensitivity quantifies the choice rather than asserting that all repeated rows are errors.
 - Unknown CustomerID maps to key `0`. Sales stay in financial totals; unknown customers are excluded from RFM,
   cohort activity and identifiable purchaser counts. Credit-only customer IDs exist in the dimension
   to preserve relationships but are excluded from the purchasing-customer denominator.
@@ -70,6 +72,9 @@ marketing lift, paid conversion, profit or customer lifetime value is made.
 The preparation reconciles Python against independent SQL financial and order totals,
 checks unique dimension keys and complete relationships, and checks cohort bounds.
 Report JSON is validated against Microsoft's public PBIR contracts; visual field references
-are checked against the model. Power BI Desktop refresh, DAX execution, rendering and
-interaction checks remain pending because Desktop is unavailable in the authoring environment.
-Offline preview PNGs are computed from the data, not screenshots from Power BI.
+are checked against the model. Power BI Desktop was used to import all seven tables,
+render all four pages and reconcile visible financial/order/customer measures.
+Country and month slicer spot checks were reconciled to SQL; the precise scope and
+results are recorded in validation.json. This is not an exhaustive UI automation suite.
+Native screenshots are in assets/screenshots. Offline preview PNGs in assets/previews
+are computed from data and remain explicitly separate from Desktop screenshots.

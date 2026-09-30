@@ -77,7 +77,7 @@ products.Description = products.Description.fillna(products.ProductKey)
 products['ProductLabel'] = products.ProductKey + ' | ' + products.Description
 products['ProductType'] = np.where(products.ProductKey.str.match(r'^\d{5}[A-Z]*$'), 'Merchandise', 'Other / charges')
 countries = pd.DataFrame({'CountryKey': sorted(fact.CountryKey.unique())})
-dates = pd.DataFrame({'Date': pd.date_range(fact.Date.min().replace(month=1, day=1), fact.Date.max().replace(month=12, day=31))})
+dates = pd.DataFrame({'Date': pd.date_range(fact.Date.min().replace(day=1), fact.Date.max() + pd.offsets.MonthEnd(0))})
 dates['Year'] = dates.Date.dt.year
 dates['Month'] = dates.Date.dt.month
 dates['YearMonth'] = dates.Date.dt.strftime('%Y-%m')

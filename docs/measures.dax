@@ -47,7 +47,7 @@ Cohort Active Customers =
 SUM(FactCohort[ActiveCustomers])
 
 Cohort Repeat Activity =
-DIVIDE(SUM(FactCohort[ActiveCustomers]), SUM(FactCohort[CohortSize]))
+IF(HASONEVALUE(FactCohort[Cohort]) && HASONEVALUE(FactCohort[Offset]), DIVIDE(SUM(FactCohort[ActiveCustomers]), SUM(FactCohort[CohortSize])))
 
 Merchandise Gross Sales =
 CALCULATE([Gross Sales], DimProduct[ProductType] = "Merchandise")

@@ -1,5 +1,6 @@
 """Author a native PBIP/PBIR report and import semantic model from prepared CSVs."""
 import json
+import sys
 from pathlib import Path
 import pandas as pd
 
@@ -10,6 +11,8 @@ MODEL = PBI / 'RetailInsights.SemanticModel'
 BASE = 'https://developer.microsoft.com/json-schemas/fabric/item/report/'
 
 def write(path, data):
+    if '--report-only' in sys.argv and path.name in ('model.bim', 'definition.pbism'):
+        return
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
 
@@ -35,7 +38,7 @@ measures = {
     'Snapshot Repeat Customers': ('CALCULATE(COUNTROWS(DimCustomer), DimCustomer[CustomerKey] <> "0", DimCustomer[Orders] > 1)', '#,0'),
     'Snapshot Repeat Share': ('DIVIDE([Snapshot Repeat Customers], [Snapshot Customers])', '0.0%'),
     'Cohort Active Customers': ('SUM(FactCohort[ActiveCustomers])', '#,0'),
-    'Cohort Repeat Activity': ('DIVIDE(SUM(FactCohort[ActiveCustomers]), SUM(FactCohort[CohortSize]))', '0.0%'),
+    'Cohort Repeat Activity': ('IF(HASONEVALUE(FactCohort[Cohort]) && HASONEVALUE(FactCohort[Offset]), DIVIDE(SUM(FactCohort[ActiveCustomers]), SUM(FactCohort[CohortSize])))', '0.0%'),
     'Merchandise Gross Sales': ('CALCULATE([Gross Sales], DimProduct[ProductType] = "Merchandise")', currency),
 }
 types = {
@@ -63,7 +66,7 @@ for path in sorted((ROOT/'data/processed').glob('*.csv')):
                 del col['sortByColumn']
         if name == 'MonthName':
             col['sortByColumn'] = 'Month'
-        if name.endswith('Key') or name == 'LineID':
+        if (name.endswith('Key') and path.stem != 'DimCountry') or name == 'LineID':
             col['isHidden'] = True
         cols.append(col)
     conversions = ', '.join('{"'+n+'", '+mt[types.get(n,'string')]+'}' for n in names)
@@ -109,6 +112,14 @@ def plot(page, name, vtype, title, x, y, w, h, roles, sort=None):
                   'background':[{'properties':{'show':literal(True),'color':color('#FFFFFF'),'transparency':literal(0)}}],
                   'border':[{'properties':{'show':literal(True),'color':color('#DCE4EC'),'radius':literal(8)}}]},
               'drillFilterOtherVisuals':True}
+    if vtype == 'slicer':
+        visual['objects'] = {'data':[{'properties':{'mode':literal('Dropdown')}}]}
+    elif vtype == 'card':
+        visual['objects'] = {'labels':[{'properties':{'fontSize':literal(24),'displayUnits':literal(0),'precision':literal(2 if 'Sales' in title or 'Credits' in title or 'Value' in title else 0)}}], 'categoryLabels':[{'properties':{'show':literal(False)}}]}
+    elif vtype in ('tableEx','pivotTable'):
+        visual['objects'] = {'grid':[{'properties':{'textSize':literal(11)}}]}
+        if vtype == 'pivotTable':
+            visual['objects']['subTotals'] = [{'properties':{'rowSubtotals':literal(False),'columnSubtotals':literal(False),'rowGrandTotal':literal(False),'columnGrandTotal':literal(False)}}]
     if sort:
         visual['query']['sortDefinition'] = {'sort':[{'field':field(*sort[:3]),'direction':sort[3]}],'isDefaultSort':False}
     write(REPORT/f'definition/pages/{page}/visuals/{name}/visual.json', {
@@ -118,19 +129,23 @@ def plot(page, name, vtype, title, x, y, w, h, roles, sort=None):
 M = lambda n: ('FactTransactions',n,True)
 C = lambda t,n: (t,n,False)
 page_order = ['Overview','Products','Customers','Cohorts']
-write(REPORT/'definition/version.json',{'$schema':BASE+'definition/versionMetadata/1.0.0/schema.json','version':'1.0.0'})
-write(REPORT/'definition/report.json',{'$schema':BASE+'definition/report/2.0.0/schema.json','themeCollection':{},'settings':{'useStylableVisualContainerHeader':True}})
+write(REPORT/'definition/version.json',{'$schema':BASE+'definition/versionMetadata/1.0.0/schema.json','version':'2.0.0'})
+write(REPORT/'definition/report.json',{'$schema':BASE+'definition/report/2.0.0/schema.json','themeCollection':{'customTheme':{'name':'RetailTheme','reportVersionAtImport':'5.37','type':'RegisteredResources'}},'resourcePackages':[{'name':'RegisteredResources','type':'RegisteredResources','items':[{'name':'RetailTheme','path':'RetailTheme.json','type':'CustomTheme'}]}],'settings':{'useStylableVisualContainerHeader':True}})
 write(REPORT/'definition/pages/pages.json',{'$schema':BASE+'definition/pagesMetadata/1.0.0/schema.json','pageOrder':page_order,'activePageName':'Overview'})
 labels = {'Overview':'01 | Trading overview','Products':'02 | Products & markets','Customers':'03 | Customer snapshot','Cohorts':'04 | Cohort repeat activity'}
 for page in page_order:
-    write(REPORT/f'definition/pages/{page}/page.json', {'$schema':BASE+'definition/page/2.0.0/schema.json','name':page,'displayName':labels[page],'displayOption':'FitToPage','width':1280,'height':800})
+    page_body = {'$schema':BASE+'definition/page/2.0.0/schema.json','name':page,'displayName':labels[page],'displayOption':'FitToPage','width':1280,'height':800,'objects':{'background':[{'properties':{'color':color('#F5F7FB'),'transparency':literal(0)}}]}}
+    if page == 'Customers':
+        page_body['filterConfig'] = {'filters':[{'name':'PurchasingCustomerSnapshot','field':field('DimCustomer','Orders'),'type':'Advanced','filter':{'Version':2,'From':[{'Name':'c','Entity':'DimCustomer','Type':0}],'Where':[{'Condition':{'Comparison':{'ComparisonKind':1,'Left':{'Column':{'Expression':{'SourceRef':{'Source':'c'}},'Property':'Orders'}},'Right':{'Literal':{'Value':'0L'}}}}}]}}]}
+    write(REPORT/f'definition/pages/{page}/page.json',page_body)
 for page in ['Overview','Products']:
     plot(page,'MonthFilter','slicer','Reporting month · Dec 2011 is partial',24,16,602,80, {'Values':[C('DimDate','YearMonth')]})
     plot(page,'CountryFilter','slicer','Country',646,16,610,80, {'Values':[C('DimCountry','CountryKey')]})
 for i,n in enumerate(['Gross Sales','Recorded Credits','Net Recorded Sales','Sales Orders']):
     plot('Overview','KPI'+str(i),'card',n,24+i*314,112,290,108,{'Values':[M(n)]})
 plot('Overview','MonthlyTrend','lineChart','Gross sales & recorded credits | GBP',24,238,800,322,{'Category':[C('DimDate','YearMonth')],'Y':[M('Gross Sales'),M('Recorded Credits')]}, ('DimDate','YearMonth',False,'Ascending'))
-plot('Overview','OperatingKPIs','tableEx','Order economics & customer coverage',844,238,412,322,{'Values':[M(n) for n in ['Average Order Value','Purchasing Customers','Known Customer Sales Share','Credit Value Share']]})
+for i,n in enumerate(['Average Order Value','Purchasing Customers','Known Customer Sales Share','Credit Value Share']):
+    plot('Overview','Operating'+str(i),'card',n,844+(i%2)*214,238+(i//2)*170,198,152,{'Values':[M(n)]})
 plot('Overview','MonthlyControls','tableEx','Monthly controls | Dec 2011 ends on the 9th',24,578,1232,196, {'Values':[C('DimDate','YearMonth')]+[M(n) for n in ['Gross Sales','Recorded Credits','Net Recorded Sales','Sales Orders','Average Order Value']]}, ('DimDate','YearMonth',False,'Ascending'))
 plot('Products','CountrySales','barChart','Gross sales by country | GBP',24,112,602,310, {'Category':[C('DimCountry','CountryKey')],'Y':[M('Gross Sales')]}, ('FactTransactions','Gross Sales',True,'Descending'))
 plot('Products','ProductSales','barChart','Products & charges | GBP · scroll for more',646,112,610,310, {'Category':[C('DimProduct','ProductLabel')],'Y':[M('Gross Sales')]}, ('FactTransactions','Gross Sales',True,'Descending'))
@@ -146,4 +161,5 @@ plot('Cohorts','CohortFilter','slicer','First observed purchase cohort',24,24,12
 plot('Cohorts','RetentionMatrix','pivotTable','Monthly repeat-purchase activity | incomplete Dec 2011 omitted',24,124,1232,440, {'Rows':[C('FactCohort','Cohort')],'Columns':[C('FactCohort','Offset')],'Values':[M('Cohort Repeat Activity')]})
 plot('Cohorts','CohortDetail','tableEx','Observed cells only | counts and denominators',24,584,1232,190, {'Values':[C('FactCohort',n) for n in ['Cohort','Offset','CohortSize','ActiveCustomers','ActivityMonth']]})
 write(ROOT/'assets/retail-theme.json', {'name':'Retail Insights','dataColors':['#167D9A','#EF9A47','#385B8D','#81B29A','#A86F98'],'background':'#F5F7FB','foreground':'#15283F','tableAccent':'#167D9A'})
+write(REPORT/'StaticResources/RegisteredResources/RetailTheme.json',json.loads((ROOT/'assets/retail-theme.json').read_text()))
 print('Built native PBIP with', len(tables), 'tables,',len(measures),'measures and',len(list(REPORT.glob('definition/pages/*/visuals/*/visual.json'))),'visuals')

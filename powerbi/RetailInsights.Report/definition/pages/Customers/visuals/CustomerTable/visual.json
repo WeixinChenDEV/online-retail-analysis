@@ -240,6 +240,21 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "grid": [
+        {
+          "properties": {
+            "textSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "11"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
   }
 }

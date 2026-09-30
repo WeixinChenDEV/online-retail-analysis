@@ -27,7 +27,7 @@
     "DimCustomer": 4372,
     "DimProduct": 3828,
     "DimCountry": 38,
-    "DimDate": 730,
+    "DimDate": 396,
     "FactCohort": 78
   },
   "segments": {

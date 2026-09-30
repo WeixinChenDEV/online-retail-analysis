@@ -33,7 +33,7 @@ try:
 except urllib.error.HTTPError as e:
     if e.code != 404:
         raise SystemExit(f'GitHub repository check failed: HTTP {e.code}')
-    repo = api('/user/repos','POST',{'name':REPO,'description':'Power BI retail analytics: reproducible Python/SQL, RFM and cohort analysis. Desktop validation pending.','private':False,'auto_init':False})
+    repo = api('/user/repos','POST',{'name':REPO,'description':'Power BI retail analytics: reproducible Python/SQL, RFM and cohort analysis.','private':False,'auto_init':False})
 else:
     # Safe retry after a previous successful create/push; don't overwrite unrelated repositories.
     if not (ROOT/'.git').exists():
@@ -54,6 +54,7 @@ if existing != remote:
     raise SystemExit('Unexpected origin URL; publication stopped.')
 subprocess.run(git+['-C',str(ROOT),'-c',f'credential.username={OWNER}','push','-u','origin','main'],check=True)
 api(f'/repos/{OWNER}/{REPO}/topics','PUT',{'names':['powerbi','data-analysis','retail-analytics','sql','python','rfm','cohort-analysis']})
+api(f'/repos/{OWNER}/{REPO}','PATCH',{'description':'Power BI retail analytics with four native report pages, SQL reconciliation, RFM and cohort analysis. Desktop-verified portfolio case study.'})
 head = api(f'/repos/{OWNER}/{REPO}/commits/main')['sha']
 print('Published:',repo['html_url'])
 print('Verified remote commit:',head)

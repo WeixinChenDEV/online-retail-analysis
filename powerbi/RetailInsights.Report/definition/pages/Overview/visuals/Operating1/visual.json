@@ -1,34 +1,20 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.1.0/schema.json",
-  "name": "OperatingKPIs",
+  "name": "Operating1",
   "position": {
-    "x": 844,
+    "x": 1058,
     "y": 238,
     "z": 0,
-    "height": 322,
-    "width": 412,
+    "height": 152,
+    "width": 198,
     "tabOrder": 0
   },
   "visual": {
-    "visualType": "tableEx",
+    "visualType": "card",
     "query": {
       "queryState": {
         "Values": {
           "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "FactTransactions"
-                    }
-                  },
-                  "Property": "Average Order Value"
-                }
-              },
-              "queryRef": "FactTransactions.Average Order Value",
-              "nativeQueryRef": "Average Order Value"
-            },
             {
               "field": {
                 "Measure": {
@@ -42,34 +28,6 @@
               },
               "queryRef": "FactTransactions.Purchasing Customers",
               "nativeQueryRef": "Purchasing Customers"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "FactTransactions"
-                    }
-                  },
-                  "Property": "Known Customer Sales Share"
-                }
-              },
-              "queryRef": "FactTransactions.Known Customer Sales Share",
-              "nativeQueryRef": "Known Customer Sales Share"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "FactTransactions"
-                    }
-                  },
-                  "Property": "Credit Value Share"
-                }
-              },
-              "queryRef": "FactTransactions.Credit Value Share",
-              "nativeQueryRef": "Credit Value Share"
             }
           ]
         }
@@ -89,7 +47,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Order economics & customer coverage'"
+                  "Value": "'Purchasing Customers'"
                 }
               }
             },
@@ -184,6 +142,48 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "labels": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "24"
+                }
+              }
+            },
+            "displayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "0"
+                }
+              }
+            },
+            "precision": {
+              "expr": {
+                "Literal": {
+                  "Value": "0"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "categoryLabels": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
   }
 }

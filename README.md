@@ -3,13 +3,12 @@
 A reproducible retail analysis covering trading performance, products and markets,
 customer segmentation, and cohort repeat-purchase activity.
 
-**Status:** Data preparation and SQL reconciliations passed. The native PBIP/PBIR
-source report is generated and schema-validated. **Power BI Desktop refresh,
-DAX execution and visual interaction checks are pending.** The images below are
-data-derived offline previews, not Power BI screenshots. This is an independent
+**Status:** Data preparation, SQL reconciliations and native PBIR schema checks passed.
+Desktop screenshots and the exact scope of runtime checks are recorded in
+[validation status](docs/validation.json). This is an independent
 historical case study; no affiliation with the retailer or UCI is implied.
 
-![Offline data preview — trading overview](assets/previews/overview.png)
+![Power BI Desktop — trading overview](assets/screenshots/overview.jpg)
 
 ## Business questions
 
@@ -37,7 +36,10 @@ profit, a matched return rate, or current-market estimates.
 ## Power BI deliverable
 
 Open **`powerbi/RetailInsights.pbip`** in standard Power BI Desktop. The report
-contains four pages, 25 native visuals, seven tables and 18 DAX measures.
+contains four pages, 28 native visuals, seven tables and 18 DAX measures.
+The local working copy also includes `RetailInsights.pbix` with imported data.
+That binary is excluded from Git because its refresh metadata contains the local
+machine's data path; the public repository contains reproducible PBIP source and CSVs.
 
 | Page | Purpose |
 | --- | --- |
@@ -59,10 +61,10 @@ python scripts/configure_local.py
 Then open the PBIP and select **Refresh**. `DataFolder` must point to the clone's
 `data/processed` folder. The project has no Desktop cache; visuals will populate
 only after refresh. Optionally apply `assets/retail-theme.json` through
-View → Themes → Browse for themes.
+View → Themes → Browse for themes. The included PBIR report already applies the theme.
 
 Do not commit the personal local path inserted by `configure_local.py`. Regenerate
-the report with `python scripts/build_powerbi.py` to restore the portable placeholder.
+the data parameter with `python scripts/configure_local.py --portable` to restore the portable placeholder.
 See [Chinese opening and validation guide](docs/打开项目.md).
 
 ### Reproduce from the original source
@@ -77,12 +79,17 @@ python -m pip install -r requirements.txt
 python scripts/download_data.py
 python scripts/analyze.py
 python scripts/build_powerbi.py
+python scripts/test_data.py
 python scripts/validate_report.py
 python scripts/create_previews.py
 python scripts/configure_local.py
 ```
 
 The validator retrieves public Microsoft schemas and requires network access.
+PBIR `definition/version.json` uses report format `2.0.0`; setting it to `1.0.0`
+can make Desktop load an empty report even when JSON schema validation passes.
+Desktop can rewrite schemas to newer versions on save; `build_powerbi.py --report-only`
+restores the reproducible report definition without replacing the saved semantic model.
 The download script retrieves the original workbook from UCI. Prepared CSVs are
 included for opening the report without rerunning preparation; raw data, SQLite
 working databases, package folders and Desktop caches are ignored by Git.
@@ -98,8 +105,8 @@ working databases, package folders and Desktop caches are ignored by Git.
 - Use tied percentile ranks and documented RFM rules rather than claiming a trained churn model.
 - Label customer scores as a fixed snapshot as of 10 December 2011.
 
-![Offline data preview — customer snapshot](assets/previews/customers.png)
-![Offline data preview — cohort repeat activity](assets/previews/cohorts.png)
+![Power BI Desktop — customer snapshot](assets/screenshots/customers.jpg)
+![Power BI Desktop — cohort repeat activity](assets/screenshots/cohorts.jpg)
 
 ## Inspect the work
 
@@ -109,6 +116,7 @@ working databases, package folders and Desktop caches are ignored by Git.
 - [SQL analysis and controls](sql/analysis.sql)
 - [Machine-readable analysis summary](docs/analysis_summary.json)
 - [Validation status](docs/validation.json)
+- [Filter and cohort data tests](docs/data_tests.json)
 - [Interview and learning notes (中文)](docs/学习与面试.md)
 
 ## Data attribution and license

@@ -1,0 +1,13 @@
+{
+  "name": "Retail Insights",
+  "dataColors": [
+    "#167D9A",
+    "#EF9A47",
+    "#385B8D",
+    "#81B29A",
+    "#A86F98"
+  ],
+  "background": "#F5F7FB",
+  "foreground": "#15283F",
+  "tableAccent": "#167D9A"
+}

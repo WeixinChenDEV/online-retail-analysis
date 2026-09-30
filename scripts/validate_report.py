@@ -33,10 +33,10 @@ for path in sorted((ROOT/'powerbi').rglob('*.json')) + list((ROOT/'powerbi').rgl
         sys.exit(1)
     count += 1
 # Semantic bindings, dimension cardinality and data types are checked separately.
-model = json.loads((ROOT/'powerbi/RetailInsights.SemanticModel/model.bim').read_text())['model']
+model = json.loads((ROOT/'powerbi/RetailInsights.SemanticModel/model.bim').read_text(encoding='utf-8'))['model']
 tables = {t['name']:t for t in model['tables']}
 for path in (ROOT/'powerbi').rglob('visual.json'):
-    visual = json.loads(path.read_text())['visual']
+    visual = json.loads(path.read_text(encoding='utf-8'))['visual']
     for role in visual['query']['queryState'].values():
         for p in role['projections']:
             kind, expr = next(iter(p['field'].items()))
@@ -47,4 +47,8 @@ for rel in model['relationships']:
     for side in ['from','to']:
         assert rel[side+'Column'] in [c['name'] for c in tables[rel[side+'Table']]['columns']]
 print('PASS:',count,'official-schema documents; all visual bindings and relationship references resolve.')
-(ROOT/'docs/validation.json').write_text(json.dumps({'official_schema_documents':count,'bindings':'passed','relationships':'passed','desktop_runtime':'not validated; Power BI Desktop unavailable'},indent=2))
+status_path = ROOT/'docs/validation.json'
+status = json.loads(status_path.read_text()) if status_path.exists() else {}
+status.update({'official_schema_documents':count,'bindings':'passed','relationships':'passed'})
+status.setdefault('desktop_runtime','pending')
+status_path.write_text(json.dumps(status,indent=2))
