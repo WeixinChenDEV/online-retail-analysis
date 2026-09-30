@@ -1,0 +1,11 @@
+.tools/
+.schema-cache/
+__pycache__/
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*.sqlite
+**/.pbi/
+*.pbix
+*.log
+.venv/
+*.zip

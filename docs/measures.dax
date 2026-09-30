@@ -1,0 +1,53 @@
+Gross Sales =
+CALCULATE(SUM(FactTransactions[LineAmount]), FactTransactions[Kind] = "Sale")
+
+Recorded Credits =
+-CALCULATE(SUM(FactTransactions[LineAmount]), FactTransactions[Kind] = "Credit")
+
+Net Recorded Sales =
+SUM(FactTransactions[LineAmount])
+
+Sales Orders =
+COUNTROWS(FactOrders)
+
+Average Order Value =
+DIVIDE([Gross Sales], [Sales Orders])
+
+Purchasing Customers =
+CALCULATE(DISTINCTCOUNT(FactOrders[CustomerKey]), FactOrders[CustomerKey] <> "0")
+
+Units Sold =
+CALCULATE(SUM(FactTransactions[Quantity]), FactTransactions[Kind] = "Sale")
+
+Credit Value Share =
+DIVIDE([Recorded Credits], [Gross Sales])
+
+Known Customer Sales Share =
+DIVIDE(CALCULATE([Gross Sales], FactTransactions[CustomerKey] <> "0"), [Gross Sales])
+
+Selected Period Repeat Customers =
+COUNTROWS(FILTER(VALUES(DimCustomer[CustomerKey]), DimCustomer[CustomerKey] <> "0" && CALCULATE([Sales Orders]) > 1))
+
+Selected Period Repeat Share =
+DIVIDE([Selected Period Repeat Customers], [Purchasing Customers])
+
+Snapshot Customers =
+CALCULATE(COUNTROWS(DimCustomer), DimCustomer[CustomerKey] <> "0", DimCustomer[Orders] > 0)
+
+Snapshot Gross Sales =
+SUM(DimCustomer[GrossSales])
+
+Snapshot Repeat Customers =
+CALCULATE(COUNTROWS(DimCustomer), DimCustomer[CustomerKey] <> "0", DimCustomer[Orders] > 1)
+
+Snapshot Repeat Share =
+DIVIDE([Snapshot Repeat Customers], [Snapshot Customers])
+
+Cohort Active Customers =
+SUM(FactCohort[ActiveCustomers])
+
+Cohort Repeat Activity =
+DIVIDE(SUM(FactCohort[ActiveCustomers]), SUM(FactCohort[CohortSize]))
+
+Merchandise Gross Sales =
+CALCULATE([Gross Sales], DimProduct[ProductType] = "Merchandise")

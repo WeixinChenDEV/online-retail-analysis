@@ -1,0 +1,646 @@
+{
+  "name": "RetailInsights",
+  "compatibilityLevel": 1601,
+  "model": {
+    "culture": "en-GB",
+    "defaultPowerBIDataSourceVersion": "powerBI_V3",
+    "sourceQueryCulture": "en-GB",
+    "tables": [
+      {
+        "name": "DimCountry",
+        "columns": [
+          {
+            "name": "CountryKey",
+            "dataType": "string",
+            "sourceColumn": "CountryKey",
+            "summarizeBy": "none",
+            "isHidden": true
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimCountry",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"\\DimCountry.csv\"), [Delimiter=\",\", Columns=1, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Typed = Table.TransformColumnTypes(Headers, {{\"CountryKey\", type text}}, \"en-GB\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "DimCustomer",
+        "columns": [
+          {
+            "name": "CustomerKey",
+            "dataType": "string",
+            "sourceColumn": "CustomerKey",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "FirstObservedPurchase",
+            "dataType": "dateTime",
+            "sourceColumn": "FirstObservedPurchase",
+            "summarizeBy": "none",
+            "formatString": "yyyy-MM-dd"
+          },
+          {
+            "name": "LastObservedPurchase",
+            "dataType": "dateTime",
+            "sourceColumn": "LastObservedPurchase",
+            "summarizeBy": "none",
+            "formatString": "yyyy-MM-dd"
+          },
+          {
+            "name": "Orders",
+            "dataType": "int64",
+            "sourceColumn": "Orders",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "GrossSales",
+            "dataType": "decimal",
+            "sourceColumn": "GrossSales",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "RecencyDays",
+            "dataType": "int64",
+            "sourceColumn": "RecencyDays",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "RScore",
+            "dataType": "int64",
+            "sourceColumn": "RScore",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "FScore",
+            "dataType": "int64",
+            "sourceColumn": "FScore",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "MScore",
+            "dataType": "int64",
+            "sourceColumn": "MScore",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Segment",
+            "dataType": "string",
+            "sourceColumn": "Segment",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Cohort",
+            "dataType": "string",
+            "sourceColumn": "Cohort",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "AsOfDate",
+            "dataType": "dateTime",
+            "sourceColumn": "AsOfDate",
+            "summarizeBy": "none",
+            "formatString": "yyyy-MM-dd"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimCustomer",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"\\DimCustomer.csv\"), [Delimiter=\",\", Columns=12, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Typed = Table.TransformColumnTypes(Headers, {{\"CustomerKey\", type text}, {\"FirstObservedPurchase\", type date}, {\"LastObservedPurchase\", type date}, {\"Orders\", Int64.Type}, {\"GrossSales\", Currency.Type}, {\"RecencyDays\", Int64.Type}, {\"RScore\", Int64.Type}, {\"FScore\", Int64.Type}, {\"MScore\", Int64.Type}, {\"Segment\", type text}, {\"Cohort\", type text}, {\"AsOfDate\", type date}}, \"en-GB\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "DimDate",
+        "columns": [
+          {
+            "name": "Date",
+            "dataType": "dateTime",
+            "sourceColumn": "Date",
+            "summarizeBy": "none",
+            "formatString": "yyyy-MM-dd"
+          },
+          {
+            "name": "Year",
+            "dataType": "int64",
+            "sourceColumn": "Year",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Month",
+            "dataType": "int64",
+            "sourceColumn": "Month",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "YearMonth",
+            "dataType": "string",
+            "sourceColumn": "YearMonth",
+            "summarizeBy": "none",
+            "sortByColumn": "YearMonthSort"
+          },
+          {
+            "name": "YearMonthSort",
+            "dataType": "int64",
+            "sourceColumn": "YearMonthSort",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "MonthName",
+            "dataType": "string",
+            "sourceColumn": "MonthName",
+            "summarizeBy": "none",
+            "sortByColumn": "Month"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimDate",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"\\DimDate.csv\"), [Delimiter=\",\", Columns=6, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Typed = Table.TransformColumnTypes(Headers, {{\"Date\", type date}, {\"Year\", Int64.Type}, {\"Month\", Int64.Type}, {\"YearMonth\", type text}, {\"YearMonthSort\", Int64.Type}, {\"MonthName\", type text}}, \"en-GB\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "DimProduct",
+        "columns": [
+          {
+            "name": "ProductKey",
+            "dataType": "string",
+            "sourceColumn": "ProductKey",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "Description",
+            "dataType": "string",
+            "sourceColumn": "Description",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "ProductLabel",
+            "dataType": "string",
+            "sourceColumn": "ProductLabel",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "ProductType",
+            "dataType": "string",
+            "sourceColumn": "ProductType",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimProduct",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"\\DimProduct.csv\"), [Delimiter=\",\", Columns=4, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Typed = Table.TransformColumnTypes(Headers, {{\"ProductKey\", type text}, {\"Description\", type text}, {\"ProductLabel\", type text}, {\"ProductType\", type text}}, \"en-GB\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "FactCohort",
+        "columns": [
+          {
+            "name": "Cohort",
+            "dataType": "string",
+            "sourceColumn": "Cohort",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Offset",
+            "dataType": "int64",
+            "sourceColumn": "Offset",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "CohortSize",
+            "dataType": "int64",
+            "sourceColumn": "CohortSize",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "ActiveCustomers",
+            "dataType": "int64",
+            "sourceColumn": "ActiveCustomers",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "ActivityMonth",
+            "dataType": "string",
+            "sourceColumn": "ActivityMonth",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "FactCohort",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"\\FactCohort.csv\"), [Delimiter=\",\", Columns=5, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Typed = Table.TransformColumnTypes(Headers, {{\"Cohort\", type text}, {\"Offset\", Int64.Type}, {\"CohortSize\", Int64.Type}, {\"ActiveCustomers\", Int64.Type}, {\"ActivityMonth\", type text}}, \"en-GB\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "FactOrders",
+        "columns": [
+          {
+            "name": "InvoiceNo",
+            "dataType": "string",
+            "sourceColumn": "InvoiceNo",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "CustomerKey",
+            "dataType": "string",
+            "sourceColumn": "CustomerKey",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "CountryKey",
+            "dataType": "string",
+            "sourceColumn": "CountryKey",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "Date",
+            "dataType": "dateTime",
+            "sourceColumn": "Date",
+            "summarizeBy": "none",
+            "formatString": "yyyy-MM-dd"
+          },
+          {
+            "name": "OrderSales",
+            "dataType": "decimal",
+            "sourceColumn": "OrderSales",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Units",
+            "dataType": "int64",
+            "sourceColumn": "Units",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "OrderKey",
+            "dataType": "string",
+            "sourceColumn": "OrderKey",
+            "summarizeBy": "none",
+            "isHidden": true
+          }
+        ],
+        "partitions": [
+          {
+            "name": "FactOrders",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"\\FactOrders.csv\"), [Delimiter=\",\", Columns=7, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Typed = Table.TransformColumnTypes(Headers, {{\"InvoiceNo\", type text}, {\"CustomerKey\", type text}, {\"CountryKey\", type text}, {\"Date\", type date}, {\"OrderSales\", Currency.Type}, {\"Units\", Int64.Type}, {\"OrderKey\", type text}}, \"en-GB\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "FactTransactions",
+        "columns": [
+          {
+            "name": "LineID",
+            "dataType": "int64",
+            "sourceColumn": "LineID",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "InvoiceNo",
+            "dataType": "string",
+            "sourceColumn": "InvoiceNo",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "ProductKey",
+            "dataType": "string",
+            "sourceColumn": "ProductKey",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "CustomerKey",
+            "dataType": "string",
+            "sourceColumn": "CustomerKey",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "CountryKey",
+            "dataType": "string",
+            "sourceColumn": "CountryKey",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "Date",
+            "dataType": "dateTime",
+            "sourceColumn": "Date",
+            "summarizeBy": "none",
+            "formatString": "yyyy-MM-dd"
+          },
+          {
+            "name": "Quantity",
+            "dataType": "int64",
+            "sourceColumn": "Quantity",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "UnitPrice",
+            "dataType": "double",
+            "sourceColumn": "UnitPrice",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "LineAmount",
+            "dataType": "decimal",
+            "sourceColumn": "LineAmount",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Kind",
+            "dataType": "string",
+            "sourceColumn": "Kind",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "KnownCustomer",
+            "dataType": "boolean",
+            "sourceColumn": "KnownCustomer",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "YearMonth",
+            "dataType": "string",
+            "sourceColumn": "YearMonth",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "FactTransactions",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"\\FactTransactions.csv\"), [Delimiter=\",\", Columns=12, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Typed = Table.TransformColumnTypes(Headers, {{\"LineID\", Int64.Type}, {\"InvoiceNo\", type text}, {\"ProductKey\", type text}, {\"CustomerKey\", type text}, {\"CountryKey\", type text}, {\"Date\", type date}, {\"Quantity\", Int64.Type}, {\"UnitPrice\", type number}, {\"LineAmount\", Currency.Type}, {\"Kind\", type text}, {\"KnownCustomer\", type logical}, {\"YearMonth\", type text}}, \"en-GB\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Gross Sales",
+            "expression": "CALCULATE(SUM(FactTransactions[LineAmount]), FactTransactions[Kind] = \"Sale\")",
+            "formatString": "£#,0.00;(£#,0.00);£0.00",
+            "displayFolder": "Retail KPIs"
+          },
+          {
+            "name": "Recorded Credits",
+            "expression": "-CALCULATE(SUM(FactTransactions[LineAmount]), FactTransactions[Kind] = \"Credit\")",
+            "formatString": "£#,0.00;(£#,0.00);£0.00",
+            "displayFolder": "Retail KPIs"
+          },
+          {
+            "name": "Net Recorded Sales",
+            "expression": "SUM(FactTransactions[LineAmount])",
+            "formatString": "£#,0.00;(£#,0.00);£0.00",
+            "displayFolder": "Retail KPIs"
+          },
+          {
+            "name": "Sales Orders",
+            "expression": "COUNTROWS(FactOrders)",
+            "formatString": "#,0",
+            "displayFolder": "Retail KPIs"
+          },
+          {
+            "name": "Average Order Value",
+            "expression": "DIVIDE([Gross Sales], [Sales Orders])",
+            "formatString": "£#,0.00;(£#,0.00);£0.00",
+            "displayFolder": "Retail KPIs"
+          },
+          {
+            "name": "Purchasing Customers",
+            "expression": "CALCULATE(DISTINCTCOUNT(FactOrders[CustomerKey]), FactOrders[CustomerKey] <> \"0\")",
+            "formatString": "#,0",
+            "displayFolder": "Retail KPIs"
+          },
+          {
+            "name": "Units Sold",
+            "expression": "CALCULATE(SUM(FactTransactions[Quantity]), FactTransactions[Kind] = \"Sale\")",
+            "formatString": "#,0",
+            "displayFolder": "Retail KPIs"
+          },
+          {
+            "name": "Credit Value Share",
+            "expression": "DIVIDE([Recorded Credits], [Gross Sales])",
+            "formatString": "0.0%",
+            "displayFolder": "Retail KPIs"
+          },
+          {
+            "name": "Known Customer Sales Share",
+            "expression": "DIVIDE(CALCULATE([Gross Sales], FactTransactions[CustomerKey] <> \"0\"), [Gross Sales])",
+            "formatString": "0.0%",
+            "displayFolder": "Retail KPIs"
+          },
+          {
+            "name": "Selected Period Repeat Customers",
+            "expression": "COUNTROWS(FILTER(VALUES(DimCustomer[CustomerKey]), DimCustomer[CustomerKey] <> \"0\" && CALCULATE([Sales Orders]) > 1))",
+            "formatString": "#,0",
+            "displayFolder": "Retail KPIs"
+          },
+          {
+            "name": "Selected Period Repeat Share",
+            "expression": "DIVIDE([Selected Period Repeat Customers], [Purchasing Customers])",
+            "formatString": "0.0%",
+            "displayFolder": "Retail KPIs"
+          },
+          {
+            "name": "Snapshot Customers",
+            "expression": "CALCULATE(COUNTROWS(DimCustomer), DimCustomer[CustomerKey] <> \"0\", DimCustomer[Orders] > 0)",
+            "formatString": "#,0",
+            "displayFolder": "Retail KPIs"
+          },
+          {
+            "name": "Snapshot Gross Sales",
+            "expression": "SUM(DimCustomer[GrossSales])",
+            "formatString": "£#,0.00;(£#,0.00);£0.00",
+            "displayFolder": "Retail KPIs"
+          },
+          {
+            "name": "Snapshot Repeat Customers",
+            "expression": "CALCULATE(COUNTROWS(DimCustomer), DimCustomer[CustomerKey] <> \"0\", DimCustomer[Orders] > 1)",
+            "formatString": "#,0",
+            "displayFolder": "Retail KPIs"
+          },
+          {
+            "name": "Snapshot Repeat Share",
+            "expression": "DIVIDE([Snapshot Repeat Customers], [Snapshot Customers])",
+            "formatString": "0.0%",
+            "displayFolder": "Retail KPIs"
+          },
+          {
+            "name": "Cohort Active Customers",
+            "expression": "SUM(FactCohort[ActiveCustomers])",
+            "formatString": "#,0",
+            "displayFolder": "Retail KPIs"
+          },
+          {
+            "name": "Cohort Repeat Activity",
+            "expression": "DIVIDE(SUM(FactCohort[ActiveCustomers]), SUM(FactCohort[CohortSize]))",
+            "formatString": "0.0%",
+            "displayFolder": "Retail KPIs"
+          },
+          {
+            "name": "Merchandise Gross Sales",
+            "expression": "CALCULATE([Gross Sales], DimProduct[ProductType] = \"Merchandise\")",
+            "formatString": "£#,0.00;(£#,0.00);£0.00",
+            "displayFolder": "Retail KPIs"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "FactTransactions_DimDate",
+        "fromTable": "FactTransactions",
+        "fromColumn": "Date",
+        "toTable": "DimDate",
+        "toColumn": "Date",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "FactTransactions_DimCustomer",
+        "fromTable": "FactTransactions",
+        "fromColumn": "CustomerKey",
+        "toTable": "DimCustomer",
+        "toColumn": "CustomerKey",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "FactTransactions_DimCountry",
+        "fromTable": "FactTransactions",
+        "fromColumn": "CountryKey",
+        "toTable": "DimCountry",
+        "toColumn": "CountryKey",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "FactOrders_DimDate",
+        "fromTable": "FactOrders",
+        "fromColumn": "Date",
+        "toTable": "DimDate",
+        "toColumn": "Date",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "FactOrders_DimCustomer",
+        "fromTable": "FactOrders",
+        "fromColumn": "CustomerKey",
+        "toTable": "DimCustomer",
+        "toColumn": "CustomerKey",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "FactOrders_DimCountry",
+        "fromTable": "FactOrders",
+        "fromColumn": "CountryKey",
+        "toTable": "DimCountry",
+        "toColumn": "CountryKey",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "Transactions_Product",
+        "fromTable": "FactTransactions",
+        "fromColumn": "ProductKey",
+        "toTable": "DimProduct",
+        "toColumn": "ProductKey",
+        "crossFilteringBehavior": "oneDirection"
+      }
+    ],
+    "expressions": [
+      {
+        "name": "DataFolder",
+        "kind": "m",
+        "expression": "\"C:\\RETAIL_INSIGHTS\\data\\processed\" meta [IsParameterQuery=true, Type=\"Text\", IsParameterQueryRequired=true]"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "PBI_QueryOrder",
+        "value": "[\"DataFolder\", \"DimCountry\", \"DimCustomer\", \"DimDate\", \"DimProduct\", \"FactCohort\", \"FactOrders\", \"FactTransactions\"]"
+      }
+    ]
+  }
+}
