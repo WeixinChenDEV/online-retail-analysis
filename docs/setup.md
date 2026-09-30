@@ -1,34 +1,52 @@
-# 打开报表
+# Opening the report｜開啟報表
 
-## 本机
+## Local copy｜本機版本
 
-直接打开 `powerbi/OnlineRetail.pbix`。这份文件已包含数据，暂时不需要重新导入。
+Open `powerbi/OnlineRetail.pbix` in the local working folder. Data is already loaded.
+The PBIX is not included on GitHub because its refresh settings contain a local path.
 
-## 从 GitHub 下载后
+在本機工作資料夾直接開啟 `powerbi/OnlineRetail.pbix`，數據已載入。
+PBIX 的重新整理設定包含本機路徑，因此未上傳至 GitHub。
 
-1. 安装标准版 Power BI Desktop。
-2. 在项目根目录运行 `python scripts/setup_paths.py`，设置 CSV 路径。
-3. 打开 `powerbi/OnlineRetail.pbip`。
-4. 如有“应用更改”提示，先点击它，再点击“刷新”。
+## Downloaded from GitHub｜從 GitHub 下載
 
-数据文件已放在 `data/processed`，仅查看报表不需要重新下载原始 Excel。
-如要从原始数据重跑，按 README 的命令执行下载、清洗和检查。
+1. Install the standard Power BI Desktop application.／安裝標準版 Power BI Desktop。
+2. Run `python scripts/setup_paths.py` from the project root.／在專案根目錄執行此命令，設定 CSV 路徑。
+3. Open `powerbi/OnlineRetail.pbip`.／開啟此專案檔案。
+4. Apply pending changes if prompted, then refresh.／按提示套用變更，再重新整理。
 
-## 初次刷新遇到问题
+Prepared CSVs are in `data/processed`. You do not need to download the original
+Excel workbook just to view the report. To rebuild the data, follow the README commands.
 
-- 提示关系需要刷新：点击该提示中的“立即刷新”。
-- 提示循环引用：关闭提示，点击“应用更改”，然后再刷新。
-- 找不到 CSV：检查 `DataFolder` 是否指向当前项目的 `data/processed`。
-- 看不到页面：确认 `definition/version.json` 中的版本是 `2.0.0`。
+整理好的 CSV 位於 `data/processed`；只查看報表不需要下載原始 Excel。
+如要重新整理原始數據，請按 README 的命令執行。
 
-提交源码前运行 `python scripts/setup_paths.py --portable`，避免上传本机路径。
-PBIX 包含本机刷新路径，因此只保留在本地；GitHub 使用 PBIP 源码。
+## First refresh｜初次重新整理
 
-## 可以检查的数字
+| Issue／問題 | Action／處理方式 |
+| --- | --- |
+| Relationships need refreshing／關聯需要重新整理 | Use the prompt's Refresh now button／按提示中的「立即重新整理」 |
+| Circular reference prompt／循環參照提示 | Close the prompt, apply pending changes and refresh／關閉提示，套用變更後再重新整理 |
+| CSV not found／找不到 CSV | Check `DataFolder` points to this copy's `data/processed`／確認路徑指向目前專案的資料夾 |
+| Pages do not appear／看不到頁面 | Check `definition/version.json` uses `2.0.0`／確認版本值為 `2.0.0` |
 
-清除经营页的筛选后，Gross Sales 为 £10,666,684.54，Recorded Credits 为
-£896,812.49，Net Recorded Sales 为 £9,769,872.05，Sales Orders 为 19,960。
-客户页显示 4,338 名购买客户，其中 2,845 名下过多笔订单。
+Before committing source changes, run `python scripts/setup_paths.py --portable`
+to remove the local path from the source model.
 
-客户分群是截至 2011-12-10 的快照。队列页只使用完整月份，截止 2011-11。
-这些页面与经营页的筛选范围不同，具体规则见 `notes.md`。
+提交源碼前執行 `python scripts/setup_paths.py --portable`，移除模型中的本機路徑。
+
+## Numbers to check｜可核對的數字
+
+With overview filters cleared: Gross Sales £10,666,684.54, Recorded Credits
+£896,812.49, Net Recorded Sales £9,769,872.05 and Sales Orders 19,960.
+The customer page has 4,338 purchasing customers, including 2,845 with multiple orders.
+
+清除概覽頁的篩選後：銷售總額 £10,666,684.54、貸記金額 £896,812.49、銷售淨額 £9,769,872.05，
+銷售訂單 19,960 筆。客戶頁有 4,338 名購買客戶，其中 2,845 名曾下多筆訂單。
+
+Customer groups are a snapshot as of 10 December 2011. Cohorts use complete months
+through November 2011. Their scope differs from overview filters; see the
+[English notes](notes.md) or [繁體中文筆記](notes.zh-Hant.md).
+
+客戶分群採用截至 2011 年 12 月 10 日的快照；購買群組只使用截至 2011 年 11 月的完整月份。
+這些頁面的範圍與概覽頁的篩選不同，詳見上述分析筆記。

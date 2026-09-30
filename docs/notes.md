@@ -1,5 +1,7 @@
 # Data and calculation notes
 
+[繁體中文](notes.zh-Hant.md) · [Project overview](../README.md)
+
 ## Source and observation window
 
 UCI Online Retail covers 1 December 2010–9 December 2011. Values are in GBP.
